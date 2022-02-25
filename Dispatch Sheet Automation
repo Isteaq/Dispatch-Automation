@@ -1,0 +1,165 @@
+from selenium import webdriver #Launch Chrome/Firefox
+from selenium.webdriver.common.by import By #to us e the By functions
+from datetime import datetime  #to use current date object
+from selenium.common.exceptions import NoSuchElementException #to continue the program
+from selenium.common.exceptions import StaleElementReferenceException
+from selenium.webdriver.common.action_chains import ActionChains  #use esc key
+import time                    #to add delay after to enter OTP
+import pprint                  #to print data in an easier readable format
+import re                      #to use regular expressions to single out the arrival/departure variables
+import gspread
+
+List = []
+
+#cellRange = ['N189:O191','N193:O195','N197:O200','N202:O204','N206:O208','N210:O212','N214:O216','N218:O221','N223:O224','N226:O228','N230:O232','N234:O236','N238:O240','N242:O244','N246:O248','N250:O252','N254:O256']
+cellRange = ['N126:O129','N131:O135','N137:O140','N142:O145','N147:O150','N152:O156','N158:O160','N162:O166','N168:O172','N174:O177','N179:O182','N184:O187']
+
+gc = gspread.service_account(filename='/Users/istea/AppData/Local/Programs/Python/Python39/service_account.json')
+sh = gc.open('Copy of 12/12 target ')
+
+dateTimeObj = datetime.now()
+dateStr = dateTimeObj.strftime('%m/%d/%Y')
+
+browser = webdriver.Chrome()                           #open browse
+browser.implicitly_wait(30)                             #wait 30 seconds 
+browser.get('XXXXXXXX')     #open website
+searchElem = browser.find_element_by_css_selector('#userID') #userID = User
+searchElem.send_keys('XXXXXX')
+searchElem2 = browser.find_element_by_css_selector('#pass')#searchElem2 = pass
+searchElem2.send_keys('XXXXXX')
+searchElem.submit()
+
+time.sleep(5)
+
+searchElem3 = browser.find_element_by_css_selector('input#otp_sms_0').click() #find and click the OTP radial button
+
+searchElem4 = browser.find_element_by_css_selector('#submit-button > span').click() #find and click submit button for OTP
+
+time.sleep(30)                  #OTP sent, 1 minute to enter OTP
+
+print('sleep done')
+
+searchElem5 = browser.find_element(By.XPATH,'//*[@id="submit-button"]') #find OTP submit button and click it
+searchElem5.click()
+
+# Click LoadTracking
+loadTracking = browser.find_element_by_css_selector('#root > div > header > div > div.MuiGrid-root.MuiGrid-container.MuiGrid-justify-xs-space-between > div > button:nth-child(2) > span.MuiButton-label > h6')
+loadTracking.click()
+
+#Gets the load ids from the 1530 to 2030 ranges from spreadsheet and stores in list, index start at 0
+List = sh.sheet1.get_values('C305:C316')
+#1900 C317:C333
+#1500 C305:C316
+
+arrDepartTimes = ['']*(len(List))
+routeList4 = [[] for i in range(len(List))]
+routeList5 = ['']*(len(List))
+
+print('right before function call')
+
+def GO():
+    for i in range(len(List)):
+        menuButtonClick = browser.find_element(By.XPATH,'//*[@id="root"]/div/div[2]/div[1]/div[1]/div/div/div[1]/div/div[1]/button')  #using Absolute Xpath to find the menu button element. 
+        menuButtonClick.click()
+        #Click on Load ID's
+        time.sleep(2)
+        clickLoadID = browser.find_element_by_css_selector('#Load\ IDs-list-item > svg')
+        time.sleep(3)
+        clickLoadID.click()
+        #Fill in the Load ID
+        searchID = browser.find_element(By.XPATH,'//*[@id="react-select-3-input"]')
+        searchID.send_keys('\ue003')
+        searchID.send_keys(List[i])
+        searchID.send_keys('\ue007')
+        time.sleep(2)
+        retrieveLoads = browser.find_element_by_css_selector('#retrieve-loads-button')
+        retrieveLoads.click()
+        time.sleep(3)
+        #open inner window. index starts at 1
+        outerMenuClick = browser.find_element(By.XPATH,'//*[@id="root"]/div/div[2]/div[2]/div[2]/div/div/div/table/tbody/tr/td[1]/div/button')
+        time.sleep(3)
+        outerMenuClick.click()#open inner window
+        time.sleep(3)
+        
+        ###add code here###
+        rows = browser.find_elements_by_xpath('//*[@id="stop-details-tab-div-'+str(List[i][0])+'\"]/div/div/div/div/div/table/tbody/tr')
+
+        print('Testing XPATH Menu Path: '+str([i+1])+ ' at element path '+str(List[i][0]))
+
+
+        try:
+            for j in range(len(rows)): #number of times to loop through each row/loads.
+                print  ('Testing List at ' +str(List[i])+ 'at element i '+str(i)+' and at element j ' + str(j))
+
+                if (i == 8):
+                    innerDriverTimesMenu = browser.find_element(By.XPATH,('//*[@id=\"stop-details-tab-div-'+str(List[i][0])+'\"]/div/div/div/div/div/table/tbody/tr['+str(j+1)+']/td[5]')) #Loops through each row in the inner table load list
+                else:
+                    innerDriverTimesMenu = browser.find_element(By.XPATH,('//*[@id=\"stop-details-tab-div-'+str(List[i][0])+'\"]/div/div/div/div/div/table/tbody/tr['+str(j+1)+']/td[6]')) #Loops through each row in the inner table load list
+
+                if((innerDriverTimesMenu.is_displayed())): #check if dropdown menu is there by searching using its class
+                    routeList2 = []
+                    routeList3 = []
+                    clickInnerMenu = browser.find_element(By.XPATH,('//*[@id="stop-details-tab-div-'+str(List[i][0])+'\"]/div/div/div/div/div/table/tbody/tr['+str(j+1)+']/td[6]/div/div/div')) ###update### load id and tr[]/td[] (not sure if tr or td yet)
+                    clickInnerMenu.click()
+                    time.sleep(1)
+                    routeList = browser.find_element_by_id("mouse-over-popover")# store tuple element
+                    time.sleep(1)
+                    routeList2.append(routeList) #store single element
+                    routeList3.append((routeList2[0].text)) #change single element to text and extend it into a list
+                    routeList4[i].append(routeList3)
+                    print ('routeList4')
+                    print(routeList4)
+                    time.sleep(1)
+                    ActionChains(browser).send_keys('\ue00C').perform()  #use esc key
+    
+        except NoSuchElementException:
+            print('Caught NoSuchException at element i ' +str(i)+ 'and j ' +str(j))
+            continue
+    
+        
+def getTimes():
+    print ('testing outloop prep')
+              
+    findTimes = re.compile(r'\d\d:\d\d')                        #regex object 
+
+    #Parse the strings to get only the arrival and departure times
+    for i in range (len(routeList4)):
+        arrDepartTimes[i] = findTimes.findall(str(routeList4[i]))
+        
+    cell_values2 = arrDepartTimes
+
+    for i in range(len(cellRange)):
+        try:
+            cell_values = sorted(cell_values2[i])
+            cellRange2  = sh.sheet1.range(str(cellRange[i]))  # iterate through for loop through cellRange
+            print(cellRange2)
+            cell_list=cellRange2
+            for j, val in enumerate(cell_values):
+                cell_list[j].value = val
+                
+            sh.sheet1.update_cells(cell_list,'USER_ENTERED')
+        except IndexError:
+            print('index error at ' +str(i)+ ' and ' +str(j))
+            continue
+
+
+while True:
+    print ('First run then..')
+    GO()
+    getTimes()
+    time.sleep(500)
+    browser.refresh()
+    
+
+    
+
+
+
+         
+         
+
+
+
+
+
+
