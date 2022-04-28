@@ -14,7 +14,7 @@ List = []
 #cellRange = ['N189:O191','N193:O195','N197:O200','N202:O204','N206:O208','N210:O212','N214:O216','N218:O221','N223:O224','N226:O228','N230:O232','N234:O236','N238:O240','N242:O244','N246:O248','N250:O252','N254:O256']
 cellRange = ['N126:O129','N131:O135','N137:O140','N142:O145','N147:O150','N152:O156','N158:O160','N162:O166','N168:O172','N174:O177','N179:O182','N184:O187']
 
-gc = gspread.service_account(filename='/Users/istea/AppData/Local/Programs/Python/Python39/service_account.json')
+gc = gspread.service_account(filename='/Users/XXXXX/AppData/Local/Programs/Python/Python39/service_account.json')
 sh = gc.open('Copy of 12/12 target ')
 
 dateTimeObj = datetime.now()
@@ -80,8 +80,7 @@ def GO():
         time.sleep(3)
         outerMenuClick.click()#open inner window
         time.sleep(3)
-        
-        ###add code here###
+       
         rows = browser.find_elements_by_xpath('//*[@id="stop-details-tab-div-'+str(List[i][0])+'\"]/div/div/div/div/div/table/tbody/tr')
 
         print('Testing XPATH Menu Path: '+str([i+1])+ ' at element path '+str(List[i][0]))
