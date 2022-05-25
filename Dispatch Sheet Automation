@@ -24,9 +24,9 @@ browser = webdriver.Chrome()                           #open browse
 browser.implicitly_wait(30)                             #wait 30 seconds 
 browser.get('XXXXXXXX')     #open website
 searchElem = browser.find_element_by_css_selector('#userID') #userID = User
-searchElem.send_keys('XXXXXX')
+searchElem.send_keys('XXXXXX') #send login details
 searchElem2 = browser.find_element_by_css_selector('#pass')#searchElem2 = pass
-searchElem2.send_keys('XXXXXX')
+searchElem2.send_keys('XXXXXX') #send login password
 searchElem.submit()
 
 time.sleep(5)
