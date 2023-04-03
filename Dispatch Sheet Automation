@@ -15,7 +15,7 @@ List = []
 cellRange = ['N126:O129','N131:O135','N137:O140','N142:O145','N147:O150','N152:O156','N158:O160','N162:O166','N168:O172','N174:O177','N179:O182','N184:O187']
 
 gc = gspread.service_account(filename='/Users/XXXXX/AppData/Local/Programs/Python/Python39/service_account.json')
-sh = gc.open('Copy of 12/12 target ')
+sh = gc.open('XXXXXX')
 
 dateTimeObj = datetime.now()
 dateStr = dateTimeObj.strftime('%m/%d/%Y')
@@ -42,11 +42,11 @@ print('sleep done')
 searchElem5 = browser.find_element(By.XPATH,'//*[@id="submit-button"]') #find OTP submit button and click it
 searchElem5.click()
 
-# Click LoadTracking
+
 loadTracking = browser.find_element_by_css_selector('#root > div > header > div > div.MuiGrid-root.MuiGrid-container.MuiGrid-justify-xs-space-between > div > button:nth-child(2) > span.MuiButton-label > h6')
 loadTracking.click()
 
-#Gets the load ids from the 1530 to 2030 ranges from spreadsheet and stores in list, index start at 0
+
 List = sh.sheet1.get_values('C305:C316')
 #1900 C317:C333
 #1500 C305:C316
@@ -87,7 +87,7 @@ def GO():
 
 
         try:
-            for j in range(len(rows)): #number of times to loop through each row/loads.
+            for j in range(len(rows)):
                 print  ('Testing List at ' +str(List[i])+ 'at element i '+str(i)+' and at element j ' + str(j))
 
                 if (i == 8):
@@ -121,7 +121,7 @@ def getTimes():
               
     findTimes = re.compile(r'\d\d:\d\d')                        #regex object 
 
-    #Parse the strings to get only the arrival and departure times
+    #Parse data
     for i in range (len(routeList4)):
         arrDepartTimes[i] = findTimes.findall(str(routeList4[i]))
         
